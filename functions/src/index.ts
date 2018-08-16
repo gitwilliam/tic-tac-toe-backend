@@ -66,3 +66,52 @@ exports.checkTurn = functions.database.ref('/games/{gameId}/board/{position}')
 
         return Promise.all(promises);
     });
+
+/*
+* Check for a Win or Draw
+*/
+exports.checkWin = functions.database.ref('/games/{gameId}/board/{position}')
+    .onUpdate((snapshot, context) => {
+        const promises = []
+        promises.push(snapshot.after.ref.parent.once('value').then(b => {
+            let win = false; 
+            const board = b.val();
+
+            // BRUTE FORCE CHECK OF THE ENTIRE BOARD.  This could be optimized
+            // to only check neighbors of $position
+            // check for a horizontal win
+            if (board[0] === board[1] && board [1] === board[2] && board[0] !== "") {
+                win = true;
+            } else if (board[3] === board[4] && board [4] === board[5] && board[3] !== "") {
+                win = true;
+            } else if (board[6] === board[7] && board [7] === board[8] && board[6] !== "") {
+                win = true;
+            
+            // check for a veritcal win
+            } else if (board[0] === board[3] && board[3] === board[6] && board[0] !== "") {
+                win = true;
+            } else if (board[1] === board[4] && board[4] === board[7] && board[1] !== "") {
+                win = true;
+            } else if (board[2] === board[5] && board[5] === board[8] && board[2] !== "") {
+                win = true;
+
+            // check for a diagonal win
+            } else if (board[0] === board[4] && board[4] === board[8] && board[0] !== "") {
+                win = true;
+            } else if (board[2] === board[4] && board[4] === board[6] && board[2] !== "") {
+                win = true;
+            }
+
+            if (win) {
+                // delete turn, so that nobody can play
+                promises.push(snapshot.after.ref.parent.parent.child('turn').remove())
+
+                // add winner
+                promises.push(snapshot.after.ref.parent.parent.child('winner').set(context.auth.uid));
+            }
+        }));
+
+        return Promise.all(promises);
+    });
+
+
