@@ -102,12 +102,26 @@ exports.checkWin = functions.database.ref('/games/{gameId}/board/{position}')
                 win = true;
             }
 
-            if (win) {
+            let cat = !win;
+            if (cat) {
+                // check for Cat's Scratch
+                board.forEach(element => {
+                    if (element === "") {
+                        cat = false;
+                    }
+                });
+            }
+
+            if (win || cat) {
                 // delete turn, so that nobody can play
-                promises.push(snapshot.after.ref.parent.parent.child('turn').remove())
+                promises.push(snapshot.after.ref.parent.parent.child('turn').remove());
 
                 // add winner
-                promises.push(snapshot.after.ref.parent.parent.child('winner').set(context.auth.uid));
+                if (cat) {
+                    promises.push(snapshot.after.ref.parent.parent.child('winner').set('cat'));
+                } else {
+                    promises.push(snapshot.after.ref.parent.parent.child('winner').set(context.auth.uid));
+                }
             }
         }));
 
