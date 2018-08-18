@@ -1,0 +1,24 @@
+{
+    "rules": {
+        ".read": "auth != null",
+        "games": {
+            "$game_id": {
+                ".write": "root.child('users').child(auth.uid).child('game').val() === $game_id || 
+                !root.child('users').child(auth.uid).child('game').exists()",
+                "board": {
+                    ".validate": "!data.parent().child('turn').exists() || 
+                    (data.parent().child('turn').exists() && data.parent().child('turn').val() === auth.uid)",
+                    "$pos": {
+                        ".validate": "!data.exists() || data.val().length == 0"
+                    }
+                }  
+            }
+        },
+        "users": {
+            "$user_id": {
+                ".write": "$user_id === auth.uid",
+                ".read": "$user_id === auth.uid"
+            }
+        }
+    }
+}
