@@ -9,7 +9,9 @@
                     ".validate": "(!data.parent().child('turn').exists() && !data.parent().child('winner').exists()) || 
                     (data.parent().child('turn').exists() && data.parent().child('turn').val() === auth.uid)",
                     "$pos": {
-                        ".validate": "!data.exists() || data.val().length == 0"
+                        ".validate": "!data.exists() || data.val().length == 0 &&
+                        ((data.parent().parent().child('turn').exists() && data.parent().parent().child('turn').val() === auth.uid)|| 
+                         (newData.val() === ''))"
                     }
                 }  
             }
