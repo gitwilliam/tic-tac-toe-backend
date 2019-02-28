@@ -17,7 +17,7 @@ exports.endGame = functions.database.ref('/games/{gameId}')
                 promises.push(snapshot.ref.root.child('users').child(snapshot.child('user2').val()).child('game').remove());
             }
         } else {
-            console.info(".endGame(): game does not exist, doing nothing.")
+            console.info("endGame(): game does not exist, doing nothing.")
         }
         return Promise.all(promises);
     });
