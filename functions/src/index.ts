@@ -53,19 +53,14 @@ export function checkTurn(snapshot, context) {
     const promises = []
     // set the current "turn" to the other user
     promises.push(snapshot.after.ref.parent.parent.once('value').then(d => {
-
-        // if it is a bot game
-        if (d.child('user2').exists() && d.child('user2').val() === "bot") {
-            if (d.child('turn').exists() && d.child('turn').val() === "bot") {
-                promises.push(snapshot.after.ref.parent.parent.update({ turn: d.child('user1').val() }));
-            } else {
-                promises.push(snapshot.after.ref.parent.parent.update({ turn: d.child('user2').val() }));
-            }
+        let player = "bot";
+        if (context.auth !== undefined) {
+            player = context.auth.uid;
         }
 
         // verify that the user playing should be
-        else if (d.child('turn').exists() && d.child('turn').val() === context.auth.uid) {
-            if (d.child('user1').val() === context.auth.uid) {
+        if (d.child('turn').exists() && d.child('turn').val() === player) {
+            if (d.child('user1').val() === player) {
                 promises.push(snapshot.after.ref.parent.parent.update({ turn: d.child('user2').val() }));
             } else {
                 promises.push(snapshot.after.ref.parent.parent.update({ turn: d.child('user1').val() }));
